@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 
 	"golang.org/x/net/html"
 
@@ -19,8 +22,14 @@ func main() {
 	})
 
 	http.HandleFunc("/ogp", func(w http.ResponseWriter, r *http.Request) {
-		u := r.URL.Query()["url"][0]
-		n, err := getHTML(u)
+		uq := r.URL.Query()["url"]
+		if len(uq) == 0 || uq[0] == "" || !isURL(uq[0]) {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("url is required"))
+			return
+		}
+
+		n, err := getHTML(uq[0])
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -60,4 +69,30 @@ func getHTML(pageURL string) (*html.Node, error) {
 	}
 
 	return n, nil
+}
+
+func isURL(s string) bool {
+	u, err := url.Parse(s)
+	if err != nil {
+		return false
+	}
+
+	// ---- Schema ----
+	if !strings.HasPrefix(u.Scheme, "http") {
+		return false
+	}
+
+	// ---- Host ----
+	if u.Hostname() == "localhost" {
+		return false
+	}
+	if ip := net.ParseIP(u.Hostname()); ip != nil {
+		return false
+	}
+	// example.com:8080 example.com
+	if u.Host != u.Hostname() {
+		return false
+	}
+
+	return true
 }
