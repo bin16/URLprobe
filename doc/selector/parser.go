@@ -3,17 +3,21 @@ package selector
 const (
 	pText = iota
 	pSpace
-	pDot   // .
-	pHash  // #
-	pComma // ,
-	pLP    // (
-	pRP    // )
-	pLB    // [
-	pRB    // ]
-	pColon // :
-	pQuote // "
-	pPlus  // +
-	pGT    // >
+	pDot      // .
+	pHash     // #
+	pComma    // ,
+	pLP       // (
+	pRP       // )
+	pLB       // [
+	pRB       // ]
+	pColon    // :
+	pQuote    // "
+	pPlus     // +
+	pGT       // >
+	pCaret    // ^
+	pDollor   // $
+	pAsterisk // *
+	pEqual    // "="
 )
 
 var pTypeMap = map[string]int{
@@ -29,6 +33,10 @@ var pTypeMap = map[string]int{
 	`"`: pQuote,
 	"+": pPlus,
 	">": pGT,
+	"$": pDollor,
+	"*": pAsterisk,
+	"^": pCaret,
+	"=": pEqual,
 }
 
 type part struct {
