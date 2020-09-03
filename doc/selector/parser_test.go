@@ -19,7 +19,9 @@ func TestParse(t *testing.T) {
 		},
 		`.card-header + [name^="form_"] *`: []part{
 			part{pType: pDot},
-			part{pType: pText, text: "card-header"},
+			part{pType: pText, text: "card"},
+			part{pType: pHyphen},
+			part{pType: pText, text: "header"},
 			part{pType: pSpace},
 			part{pType: pPlus},
 			part{pType: pSpace},
@@ -47,7 +49,9 @@ func TestParse(t *testing.T) {
 
 			part{pType: pText, text: "button"},
 			part{pType: pDot},
-			part{pType: pText, text: "btn-primary"},
+			part{pType: pText, text: "btn"},
+			part{pType: pHyphen},
+			part{pType: pText, text: "primary"},
 
 			part{pType: pComma},
 			part{pType: pSpace},
@@ -94,4 +98,33 @@ func plText(pl []part) string {
 		}
 	}
 	return "{" + strings.Join(sl, "|") + "}"
+}
+
+func TestCut(t *testing.T) {
+	checklist := map[string]([]string){
+		".btn.btn-primary":              []string{".", "btn", ".", "btn", "-", "primary"},
+		"#app .container button > span": []string{"#", "app", " ", ".", "container", " ", "button", " ", ">", " ", "span"},
+		"#app .container button>span":   []string{"#", "app", " ", ".", "container", " ", "button", ">", "span"},
+		"#app .container   button>span": []string{"#", "app", " ", ".", "container", " ", "button", ">", "span"},
+		"#app a.button, #app button":    []string{"#", "app", " ", "a", ".", "button", ",", " ", "#", "app", " ", "button"},
+	}
+	for k, v := range checklist {
+		tCut(t, k)(v)
+	}
+}
+func tCut(t *testing.T, s string) func(r0 []string) {
+	return func(r0 []string) {
+		t.Helper()
+		r1 := cut(s)
+		if len(r0) != len(r1) {
+			t.Errorf("Failed: cut(%s),\n got %s, \nwant %s", s, strings.Join(r1, "/"), strings.Join(r0, "/"))
+			return
+		}
+		for i, p := range r0 {
+			if r1[i] != p {
+				t.Errorf("Failed: cut(%s),\n got %s, \nwant %s", s, strings.Join(r1, "/"), strings.Join(r0, "/"))
+				return
+			}
+		}
+	}
 }

@@ -17,31 +17,93 @@ const (
 	pCaret    // ^
 	pDollor   // $
 	pAsterisk // *
-	pEqual    // "="
+	pEqual    // =
+	pHyphen   // -
+	pPipe     // |
+	pTilde    // ~
+
+	pPipeEqual     // |=
+	pTildeEqual    // ~=
+	pCaretEqual    // ^=
+	pDollorEqual   // $=
+	pAsteriskEqual // *=
+	pHyphenEqual   // -=
 )
 
 var pTypeMap = map[string]int{
-	" ": pSpace,
-	".": pDot,
-	"#": pHash,
-	",": pComma,
-	"(": pLP,
-	")": pRP,
-	"[": pLB,
-	"]": pRB,
-	":": pColon,
-	`"`: pQuote,
-	"+": pPlus,
-	">": pGT,
-	"$": pDollor,
-	"*": pAsterisk,
-	"^": pCaret,
-	"=": pEqual,
+	" ":  pSpace,
+	".":  pDot,
+	"#":  pHash,
+	",":  pComma,
+	"(":  pLP,
+	")":  pRP,
+	"[":  pLB,
+	"]":  pRB,
+	`"`:  pQuote,
+	">":  pGT,
+	":":  pColon,
+	"-=": pHyphenEqual,
+	"|=": pPipeEqual,
+	"~=": pTildeEqual,
+	"^=": pCaretEqual,
+	"$=": pDollorEqual,
+	"*=": pAsteriskEqual,
+	"+":  pPlus,
+	"$":  pDollor,
+	"*":  pAsterisk,
+	"^":  pCaret,
+	"=":  pEqual,
+	"-":  pHyphen,
+	"|":  pPipe,
+	"~":  pTilde,
 }
 
 type part struct {
 	pType int
 	text  string
+}
+
+func cut(s string) []string {
+	units := []string{}
+	buf := []rune{}
+	rl := []rune(s)
+	ppt := -1
+	for _, ch := range rl {
+		pt := pGetType([]rune{ch})
+		if pt != ppt {
+			if len(buf) > 0 {
+				units = append(units, string(buf))
+			}
+			buf = []rune{ch}
+		} else if pt == pSpace && len(buf) > 0 {
+			continue
+		} else {
+			buf = append(buf, ch)
+		}
+		ppt = pt
+	}
+	if len(buf) > 0 {
+		units = append(units, string(buf))
+	}
+
+	return units
+}
+
+func parseV2(s string) []part {
+	pl := []part{}
+	rl := []rune(s)
+	buf := []rune{}
+	ppt := -1
+	for _, ch := range rl {
+		pt := pGetType([]rune{ch})
+		if ppt == pText {
+			if pt == ppt {
+				buf = append(buf, ch)
+			}
+		}
+	}
+
+	return pl
 }
 
 func parse(s string) []part {
