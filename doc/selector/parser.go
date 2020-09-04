@@ -89,7 +89,7 @@ func cut(s string) []string {
 	return units
 }
 
-func parseV2(s string) []part {
+func parse(s string) []part {
 	pl := []part{}
 	sl := cut(s)
 	for _, s1 := range sl {
@@ -99,40 +99,6 @@ func parseV2(s string) []part {
 		} else {
 			pl = append(pl, part{pType: pt, text: s1})
 		}
-	}
-
-	return pl
-}
-
-func parse(s string) []part {
-	pl := []part{}
-	rl := []rune(s)
-	buf := []rune{}
-	ppt := -1
-	for _, ch := range rl {
-		pt := pGetType([]rune{ch})
-		if pt == pText {
-			buf = append(buf, ch)
-		} else if pt == pSpace {
-			if ppt == pSpace {
-				continue
-			} else if ppt == pText {
-				pl = append(pl, part{pType: pText, text: string(buf)})
-				buf = []rune{}
-			}
-			pl = append(pl, part{pType: pSpace})
-		} else {
-			if ppt == pText {
-				pl = append(pl, part{pType: pText, text: string(buf)})
-				buf = []rune{}
-			}
-			pl = append(pl, part{pType: pt})
-		}
-
-		ppt = pt
-	}
-	if len(buf) > 0 {
-		pl = append(pl, part{pType: pText, text: string(buf)})
 	}
 
 	return pl
