@@ -91,15 +91,13 @@ func cut(s string) []string {
 
 func parseV2(s string) []part {
 	pl := []part{}
-	rl := []rune(s)
-	buf := []rune{}
-	ppt := -1
-	for _, ch := range rl {
-		pt := pGetType([]rune{ch})
-		if ppt == pText {
-			if pt == ppt {
-				buf = append(buf, ch)
-			}
+	sl := cut(s)
+	for _, s1 := range sl {
+		pt := pGetType([]rune(s1))
+		if pt != pText {
+			pl = append(pl, part{pType: pt})
+		} else {
+			pl = append(pl, part{pType: pt, text: s1})
 		}
 	}
 

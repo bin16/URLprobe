@@ -72,7 +72,7 @@ func TestParse(t *testing.T) {
 func tParse(t *testing.T, s string) func(r0 []part) {
 	return func(r0 []part) {
 		t.Helper()
-		r1 := parse(s)
+		r1 := parseV2(s)
 		if len(r0) != len(r1) {
 			t.Errorf("Failed: parse(%s),\n got %s, \nwant %s", s, plText(r1), plText(r0))
 			return
