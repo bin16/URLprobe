@@ -38,6 +38,20 @@ func TestParse(t *testing.T) {
 		token{category: tText, text: "name=content"},
 		token{category: tRB},
 	})
+	tParse(t, ".a,.b")(tokenList{
+		token{category: tDot},
+		token{category: tText, text: "a"},
+		token{category: tComma},
+		token{category: tDot},
+		token{category: tText, text: "b"},
+	})
+	tParse(t, ".a, .b")(tokenList{
+		token{category: tDot},
+		token{category: tText, text: "a"},
+		token{category: tComma},
+		token{category: tDot},
+		token{category: tText, text: "b"},
+	})
 }
 func tParse(t *testing.T, s string) func(t0 tokenList) {
 	return func(t0 tokenList) {

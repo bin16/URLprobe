@@ -89,6 +89,7 @@ const (
 	ctxDot
 	ctxHash
 	ctxSpace
+	ctxAnother
 )
 
 var oMap = map[rune]int{
@@ -101,6 +102,8 @@ var oMap = map[rune]int{
 
 func nextContext(r rune) int {
 	switch r {
+	case ',':
+		return ctxAnother
 	case '.':
 		return ctxDot
 	case '#':
@@ -123,14 +126,22 @@ func parse(s string) tokenList {
 					tl = append(tl, token{category: tText, text: string(buf)})
 					buf = []rune{}
 				}
-
-				if ch == '#' {
+				if ch == ',' {
+					tl = append(tl, token{category: tComma})
+				} else if ch == '#' {
 					tl = append(tl, token{category: tHash})
 				} else if ch == '.' {
 					tl = append(tl, token{category: tDot})
 				} else if ch == '[' {
-					ctx = ctxAttr
 					tl = append(tl, token{category: tLB})
+					ctx = ctxAttr
+				}
+			} else if ch == ' ' {
+				if i > 1 {
+					lc := tl[i-1].category
+					if lc != tSpace && lc != tComma {
+						tl = append(tl, token{category: tSpace})
+					}
 				}
 			} else {
 				buf = append(buf, ch)
@@ -165,8 +176,11 @@ func parse(s string) tokenList {
 				tl = append(tl, token{category: tText, text: string(buf)})
 				buf = []rune{}
 			}
-			if i > 1 && tl[i-1].category != tSpace {
-				tl = append(tl, token{category: tSpace})
+			if i > 1 {
+				lc := tl[i-1].category
+				if lc != tSpace && lc != tComma {
+					tl = append(tl, token{category: tSpace})
+				}
 			}
 			buf = []rune{}
 		} else {
